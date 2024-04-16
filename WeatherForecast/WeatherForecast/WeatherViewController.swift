@@ -6,18 +6,12 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController {
+final class WeatherViewController: UIViewController {
     var tableView: UITableView!
     let refreshControl: UIRefreshControl = UIRefreshControl()
     var weatherJSON: WeatherJSON?
     var icons: [UIImage]?
     let imageChache: NSCache<NSString, UIImage> = NSCache()
-    let dateFormatter: DateFormatter = {
-        let formatter: DateFormatter = DateFormatter()
-        formatter.locale = .init(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy-MM-dd(EEEEE) a HH:mm"
-        return formatter
-    }()
     
     var tempUnit: TempUnit = .metric
     
@@ -49,7 +43,7 @@ extension WeatherViewController {
     private func initialSetUp() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "화씨", image: nil, target: self, action: #selector(changeTempUnit))
         
-        layTable()
+        initTableView()
         
         refreshControl.addTarget(self,
                                  action: #selector(refresh),
@@ -61,7 +55,7 @@ extension WeatherViewController {
         tableView.delegate = self
     }
     
-    private func layTable() {
+    private func initTableView() {
         tableView = .init(frame: .zero, style: .plain)
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -123,7 +117,7 @@ extension WeatherViewController: UITableViewDataSource {
         cell.temperatureLabel.text = "\(weatherForecastInfo.main.temp)\(tempUnit.expression)"
         
         let date: Date = Date(timeIntervalSince1970: weatherForecastInfo.dt)
-        cell.dateLabel.text = dateFormatter.string(from: date)
+        cell.dateLabel.text = date.toWeatherDateString
                 
         let iconName: String = weatherForecastInfo.weather.icon         
         let urlString: String = "https://openweathermap.org/img/wn/\(iconName)@2x.png"

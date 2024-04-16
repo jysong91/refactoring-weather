@@ -6,18 +6,11 @@
 
 import UIKit
 
-class WeatherDetailViewController: UIViewController {
+final class WeatherDetailViewController: UIViewController {
 
     var weatherForecastInfo: WeatherForecastInfo?
     var cityInfo: City?
     var tempUnit: TempUnit = .metric
-    
-    let dateFormatter: DateFormatter = {
-        let formatter: DateFormatter = DateFormatter()
-        formatter.locale = .init(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy-MM-dd(EEEEE) a HH:mm"
-        return formatter
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +23,7 @@ class WeatherDetailViewController: UIViewController {
         guard let listInfo = weatherForecastInfo else { return }
         
         let date: Date = Date(timeIntervalSince1970: listInfo.dt)
-        navigationItem.title = dateFormatter.string(from: date)
+        navigationItem.title = date.toWeatherDateString
         
         let iconImageView: UIImageView = UIImageView()
         let weatherGroupLabel: UILabel = UILabel()
