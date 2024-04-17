@@ -13,8 +13,8 @@ final class WeatherDetailView: UIView {
     private let weatherDescriptionLabel: UILabel = UILabel()
     private let temperatureLabel: UILabel = UILabel()
     private let feelsLikeLabel: UILabel = UILabel()
-    private let maximumTemperatureLable: UILabel = UILabel()
-    private let minimumTemperatureLable: UILabel = UILabel()
+    private let maximumTemperatureLabel: UILabel = UILabel()
+    private let minimumTemperatureLabel: UILabel = UILabel()
     private let popLabel: UILabel = UILabel()
     private let humidityLabel: UILabel = UILabel()
     private let sunriseTimeLabel: UILabel = UILabel()
@@ -47,8 +47,8 @@ final class WeatherDetailView: UIView {
             weatherDescriptionLabel,
             temperatureLabel,
             feelsLikeLabel,
-            maximumTemperatureLable,
-            minimumTemperatureLable,
+            maximumTemperatureLabel,
+            minimumTemperatureLabel,
             popLabel,
             humidityLabel,
             sunriseTimeLabel,
@@ -100,8 +100,8 @@ final class WeatherDetailView: UIView {
         let tempUnit = TempUnitManager.shared.getCurrentUnitExpression()
         temperatureLabel.text = "현재 기온 : \(listInfo.main.temp)\(tempUnit)"
         feelsLikeLabel.text = "체감 기온 : \(listInfo.main.feelsLike)\(tempUnit)"
-        maximumTemperatureLable.text = "최고 기온 : \(listInfo.main.tempMax)\(tempUnit)"
-        minimumTemperatureLable.text = "최저 기온 : \(listInfo.main.tempMin)\(tempUnit)"
+        maximumTemperatureLabel.text = "최고 기온 : \(listInfo.main.tempMax)\(tempUnit)"
+        minimumTemperatureLabel.text = "최저 기온 : \(listInfo.main.tempMin)\(tempUnit)"
         popLabel.text = "강수 확률 : \(listInfo.main.pop * 100)%"
         humidityLabel.text = "습도 : \(listInfo.main.humidity)%"
         
