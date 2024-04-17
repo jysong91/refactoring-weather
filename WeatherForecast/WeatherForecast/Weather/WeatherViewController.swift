@@ -55,6 +55,7 @@ extension WeatherViewController {
             weatherJSON = await api.fetchWeatherJSON()
             weatherView?.tableViewReloadData()
             refreshControl.endRefreshing()
+            navigationItem.title = weatherJSON?.city.name
         }
     }
     
