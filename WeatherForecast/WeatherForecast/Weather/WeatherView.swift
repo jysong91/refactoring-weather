@@ -20,7 +20,7 @@ final class WeatherView: UIView {
     
     private var weatherJSON: WeatherJSON?
     private var icons: [UIImage]?
-    private let imageChache: NSCache<NSString, UIImage> = NSCache()
+//    private let imageChache: NSCache<NSString, UIImage> = NSCache()
     let delegate: WeatherViewDelegate
     
     init(delegate: WeatherViewDelegate) {
@@ -82,28 +82,6 @@ extension WeatherView: UITableViewDataSource {
         
         cell.updateCell(with: weatherForecastInfo)
         
-        let iconName: String = weatherForecastInfo.weather.icon
-        let urlString: String = "https://openweathermap.org/img/wn/\(iconName)@2x.png"
-        
-        if let image = imageChache.object(forKey: urlString as NSString) {
-            cell.weatherIcon.image = image
-            return cell
-        }
-        
-        Task {
-            guard let url: URL = URL(string: urlString),
-                  let (data, _) = try? await URLSession.shared.data(from: url),
-                  let image: UIImage = UIImage(data: data) else {
-                return
-            }
-            
-            imageChache.setObject(image, forKey: urlString as NSString)
-            
-            if indexPath == tableView.indexPath(for: cell) {
-                cell.weatherIcon.image = image
-            }
-        }
-      
         return cell
     }
 }
