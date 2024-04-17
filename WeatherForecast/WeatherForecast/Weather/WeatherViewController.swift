@@ -12,12 +12,22 @@ final class WeatherViewController: UIViewController {
     var icons: [UIImage]?
     let imageChache: NSCache<NSString, UIImage> = NSCache()
     
-    var tempUnit: TempUnit = .metric
-    var weatherView: WeatherView?
+    private var tempUnit: TempUnit = .metric
+    private var weatherView: WeatherView?
+    private var api: WeatherServiceable
     
     override func viewDidLoad() {
         super.viewDidLoad()
         initialSetUp()
+    }
+    
+    init(api: WeatherServiceable) {
+        self.api = api
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func loadView() {
@@ -41,9 +51,11 @@ extension WeatherViewController {
     }
     
     @objc private func refresh() {
-        fetchWeatherJSON()
-        weatherView?.tableViewReloadData()
-        refreshControl.endRefreshing()
+        Task {
+            weatherJSON = await api.fetchWeatherJSON()
+            weatherView?.tableViewReloadData()
+            refreshControl.endRefreshing()
+        }
     }
     
     private func initialSetUp() {
@@ -59,29 +71,6 @@ extension WeatherViewController {
     }
     
  
-}
-
-extension WeatherViewController {
-    private func fetchWeatherJSON() {
-        
-        let jsonDecoder: JSONDecoder = .init()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        
-        guard let data = NSDataAsset(name: "weather")?.data else {
-            return
-        }
-        
-        let info: WeatherJSON
-        do {
-            info = try jsonDecoder.decode(WeatherJSON.self, from: data)
-        } catch {
-            print(error.localizedDescription)
-            return
-        }
-        
-        weatherJSON = info
-        navigationItem.title = weatherJSON?.city.name
-    }
 }
 
 extension WeatherViewController: UITableViewDataSource {
