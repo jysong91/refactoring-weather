@@ -1,23 +1,29 @@
 //
 //  WeatherForecast - ViewController.swift
-//  Created by yagom. 
+//  Created by yagom.
 //  Copyright © yagom. All rights reserved.
-// 
+//
 
 import UIKit
 
 final class WeatherViewController: UIViewController {
-    var tableView: UITableView!
     let refreshControl: UIRefreshControl = UIRefreshControl()
     var weatherJSON: WeatherJSON?
     var icons: [UIImage]?
     let imageChache: NSCache<NSString, UIImage> = NSCache()
     
     var tempUnit: TempUnit = .metric
+    var weatherView: WeatherView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         initialSetUp()
+    }
+    
+    override func loadView() {
+        weatherView = WeatherView(delegate: self,
+                                  dataSource: self)
+        view = weatherView
     }
 }
 
@@ -36,39 +42,23 @@ extension WeatherViewController {
     
     @objc private func refresh() {
         fetchWeatherJSON()
-        tableView.reloadData()
+        weatherView?.tableViewReloadData()
         refreshControl.endRefreshing()
     }
     
     private func initialSetUp() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "화씨", image: nil, target: self, action: #selector(changeTempUnit))
         
-        initTableView()
+        
         
         refreshControl.addTarget(self,
                                  action: #selector(refresh),
                                  for: .valueChanged)
         
-        tableView.refreshControl = refreshControl
-        tableView.register(WeatherTableViewCell.self, forCellReuseIdentifier: "WeatherCell")
-        tableView.dataSource = self
-        tableView.delegate = self
+        weatherView?.setTableViewRefreshControl(refreshControl: refreshControl)
     }
     
-    private func initTableView() {
-        tableView = .init(frame: .zero, style: .plain)
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let safeArea: UILayoutGuide = view.safeAreaLayoutGuide
-        
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: safeArea.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
-            tableView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
-        ])
-    }
+ 
 }
 
 extension WeatherViewController {
@@ -76,7 +66,7 @@ extension WeatherViewController {
         
         let jsonDecoder: JSONDecoder = .init()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-
+        
         guard let data = NSDataAsset(name: "weather")?.data else {
             return
         }
@@ -88,7 +78,7 @@ extension WeatherViewController {
             print(error.localizedDescription)
             return
         }
-
+        
         weatherJSON = info
         navigationItem.title = weatherJSON?.city.name
     }
@@ -112,16 +102,12 @@ extension WeatherViewController: UITableViewDataSource {
             return cell
         }
         
-        cell.weatherLabel.text = weatherForecastInfo.weather.main
-        cell.descriptionLabel.text = weatherForecastInfo.weather.description
-        cell.temperatureLabel.text = "\(weatherForecastInfo.main.temp)\(tempUnit.expression)"
+        cell.updateCell(with: weatherForecastInfo,
+                        tempUnit: tempUnit)
         
-        let date: Date = Date(timeIntervalSince1970: weatherForecastInfo.dt)
-        cell.dateLabel.text = date.toWeatherDateString
-                
-        let iconName: String = weatherForecastInfo.weather.icon         
+        let iconName: String = weatherForecastInfo.weather.icon
         let urlString: String = "https://openweathermap.org/img/wn/\(iconName)@2x.png"
-                
+        
         if let image = imageChache.object(forKey: urlString as NSString) {
             cell.weatherIcon.image = image
             return cell
@@ -140,7 +126,7 @@ extension WeatherViewController: UITableViewDataSource {
                 cell.weatherIcon.image = image
             }
         }
-        
+      
         return cell
     }
 }

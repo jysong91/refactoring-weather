@@ -1,30 +1,34 @@
 //
-//  WeatherForecast - WeatherDetailViewController.swift
-//  Created by yagom. 
-//  Copyright © yagom. All rights reserved.
-// 
+//  WeatherDetailView.swift
+//  WeatherForecast
+//
+//  Created by Hong yujin on 4/17/24.
+//
 
 import UIKit
 
-final class WeatherDetailViewController: UIViewController {
-
-    var weatherForecastInfo: WeatherForecastInfo?
-    var cityInfo: City?
-    var tempUnit: TempUnit = .metric
+final class WeatherDetailView: UIView {
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        initialSetUp()
+    private let listInfo: WeatherForecastInfo?
+    private let tempUnit: TempUnit
+    private let cityInfo: City?
+    
+    init(weatherForecastInfo: WeatherForecastInfo?,
+         tempUnit: TempUnit,
+         cityInfo: City?) {
+        self.listInfo = weatherForecastInfo
+        self.tempUnit = tempUnit
+        self.cityInfo = cityInfo
+        
+        super.init(frame: .zero)
+        layoutView()
     }
     
-    private func initialSetUp() {
-        view.backgroundColor = .white
-        
-        guard let listInfo = weatherForecastInfo else { return }
-        
-        let date: Date = Date(timeIntervalSince1970: listInfo.dt)
-        navigationItem.title = date.toWeatherDateString
-        
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func layoutView() {
         let iconImageView: UIImageView = UIImageView()
         let weatherGroupLabel: UILabel = UILabel()
         let weatherDescriptionLabel: UILabel = UILabel()
@@ -70,10 +74,10 @@ final class WeatherDetailViewController: UIViewController {
         mainStackView.axis = .vertical
         mainStackView.alignment = .center
         mainStackView.spacing = 8
-        view.addSubview(mainStackView)
+        addSubview(mainStackView)
         mainStackView.translatesAutoresizingMaskIntoConstraints = false
         
-        let safeArea: UILayoutGuide = view.safeAreaLayoutGuide
+        let safeArea: UILayoutGuide = safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             mainStackView.topAnchor.constraint(equalTo: safeArea.topAnchor),
             mainStackView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
@@ -85,6 +89,8 @@ final class WeatherDetailViewController: UIViewController {
             iconImageView.widthAnchor.constraint(equalTo: safeArea.widthAnchor,
                                                  multiplier: 0.3)
         ])
+        
+        guard let listInfo = listInfo else { return }
         
         weatherGroupLabel.text = listInfo.weather.main
         weatherDescriptionLabel.text = listInfo.weather.description
