@@ -8,16 +8,25 @@
 import UIKit
 
 final class WeatherDetailView: UIView {
+    private let iconImageView: UIImageView = UIImageView()
+    private let weatherGroupLabel: UILabel = UILabel()
+    private let weatherDescriptionLabel: UILabel = UILabel()
+    private let temperatureLabel: UILabel = UILabel()
+    private let feelsLikeLabel: UILabel = UILabel()
+    private let maximumTemperatureLable: UILabel = UILabel()
+    private let minimumTemperatureLable: UILabel = UILabel()
+    private let popLabel: UILabel = UILabel()
+    private let humidityLabel: UILabel = UILabel()
+    private let sunriseTimeLabel: UILabel = UILabel()
+    private let sunsetTimeLabel: UILabel = UILabel()
+    private let spacingView: UIView = UIView()
     
     private let listInfo: WeatherForecastInfo?
-    private let tempUnit: TempUnit
     private let cityInfo: City?
     
     init(weatherForecastInfo: WeatherForecastInfo?,
-         tempUnit: TempUnit,
          cityInfo: City?) {
         self.listInfo = weatherForecastInfo
-        self.tempUnit = tempUnit
         self.cityInfo = cityInfo
         
         super.init(frame: .zero)
@@ -29,18 +38,6 @@ final class WeatherDetailView: UIView {
     }
     
     private func layoutView() {
-        let iconImageView: UIImageView = UIImageView()
-        let weatherGroupLabel: UILabel = UILabel()
-        let weatherDescriptionLabel: UILabel = UILabel()
-        let temperatureLabel: UILabel = UILabel()
-        let feelsLikeLabel: UILabel = UILabel()
-        let maximumTemperatureLable: UILabel = UILabel()
-        let minimumTemperatureLable: UILabel = UILabel()
-        let popLabel: UILabel = UILabel()
-        let humidityLabel: UILabel = UILabel()
-        let sunriseTimeLabel: UILabel = UILabel()
-        let sunsetTimeLabel: UILabel = UILabel()
-        let spacingView: UIView = UIView()
         spacingView.backgroundColor = .clear
         spacingView.setContentHuggingPriority(.defaultLow, for: .vertical)
         
@@ -90,14 +87,21 @@ final class WeatherDetailView: UIView {
                                                  multiplier: 0.3)
         ])
         
+        updateDetailView()
+    }
+    
+    private func updateDetailView() {
         guard let listInfo = listInfo else { return }
         
         weatherGroupLabel.text = listInfo.weather.main
         weatherDescriptionLabel.text = listInfo.weather.description
-        temperatureLabel.text = "현재 기온 : \(listInfo.main.temp)\(tempUnit.expression)"
-        feelsLikeLabel.text = "체감 기온 : \(listInfo.main.feelsLike)\(tempUnit.expression)"
-        maximumTemperatureLable.text = "최고 기온 : \(listInfo.main.tempMax)\(tempUnit.expression)"
-        minimumTemperatureLable.text = "최저 기온 : \(listInfo.main.tempMin)\(tempUnit.expression)"
+        
+        
+        let tempUnit = TempUnitManager.shared.getCurrentUnitExpression()
+        temperatureLabel.text = "현재 기온 : \(listInfo.main.temp)\(tempUnit)"
+        feelsLikeLabel.text = "체감 기온 : \(listInfo.main.feelsLike)\(tempUnit)"
+        maximumTemperatureLable.text = "최고 기온 : \(listInfo.main.tempMax)\(tempUnit)"
+        minimumTemperatureLable.text = "최저 기온 : \(listInfo.main.tempMin)\(tempUnit)"
         popLabel.text = "강수 확률 : \(listInfo.main.pop * 100)%"
         humidityLabel.text = "습도 : \(listInfo.main.humidity)%"
         

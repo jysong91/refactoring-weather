@@ -10,7 +10,6 @@ final class WeatherDetailViewController: UIViewController {
 
     var weatherForecastInfo: WeatherForecastInfo?
     var cityInfo: City?
-    var tempUnit: TempUnit = .metric
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,7 +18,6 @@ final class WeatherDetailViewController: UIViewController {
     
     override func loadView() {
         view = WeatherDetailView(weatherForecastInfo: weatherForecastInfo,
-                                 tempUnit: tempUnit,
                                  cityInfo: cityInfo)
     }
     
