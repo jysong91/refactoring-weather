@@ -18,9 +18,8 @@ final class WeatherView: UIView {
         return tableView
     }()
     
-    private var weatherJSON: WeatherJSON?
-    private var icons: [UIImage]?
-//    private let imageChache: NSCache<NSString, UIImage> = NSCache()
+    private var weatherForecast: [WeatherForecastInfo]?
+    private var cityInfo: City?
     let delegate: WeatherViewDelegate
     
     init(delegate: WeatherViewDelegate) {
@@ -57,7 +56,8 @@ final class WeatherView: UIView {
     }
     
     func tableViewReloadData(with weatherJSON: WeatherJSON) {
-        self.weatherJSON = weatherJSON
+        weatherForecast = weatherJSON.weatherForecast
+        cityInfo = weatherJSON.city
         tableView.reloadData()
     }
 }
@@ -69,14 +69,14 @@ extension WeatherView: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weatherJSON?.weatherForecast.count ?? 0
+        weatherForecast?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell", for: indexPath)
         
         guard let cell: WeatherTableViewCell = cell as? WeatherTableViewCell,
-              let weatherForecastInfo = weatherJSON?.weatherForecast[indexPath.row] else {
+              let weatherForecastInfo = weatherForecast?[indexPath.row] else {
             return cell
         }
         
@@ -89,8 +89,8 @@ extension WeatherView: UITableViewDataSource {
 extension WeatherView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        delegate.presentWeatherDetail(weatherForecastInfo: weatherJSON?.weatherForecast[indexPath.row],
-                                      cityInfo: weatherJSON?.city)
+        delegate.presentWeatherDetail(weatherForecastInfo: weatherForecast?[indexPath.row],
+                                      cityInfo: cityInfo)
     }
 }
 
