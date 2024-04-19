@@ -7,11 +7,11 @@
 
 import UIKit
 
-protocol WeatherViewDelegate: AnyObject {
-    func presentWeatherDetail(weatherForecastInfo: WeatherForecastInfo?, cityInfo: City?)
-}
-
 final class WeatherView: UIView {
+    protocol Delegate: AnyObject {
+        func presentWeatherDetail(weatherForecastInfo: WeatherForecastInfo?, cityInfo: City?)
+    }
+    
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.register(WeatherTableViewCell.self, forCellReuseIdentifier: "WeatherCell")
@@ -20,9 +20,9 @@ final class WeatherView: UIView {
     
     private var weatherForecast: [WeatherForecastInfo]?
     private var cityInfo: City?
-    weak var delegate: WeatherViewDelegate?
+    weak var delegate: WeatherView.Delegate?
     
-    init(delegate: WeatherViewDelegate) {
+    init(delegate: WeatherView.Delegate) {
         self.delegate = delegate
         super.init(frame: .zero)
         layoutView()
@@ -89,7 +89,7 @@ extension WeatherView: UITableViewDataSource {
 extension WeatherView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        delegate.presentWeatherDetail(weatherForecastInfo: weatherForecast?[indexPath.row],
+        delegate?.presentWeatherDetail(weatherForecastInfo: weatherForecast?[indexPath.row],
                                       cityInfo: cityInfo)
     }
 }
