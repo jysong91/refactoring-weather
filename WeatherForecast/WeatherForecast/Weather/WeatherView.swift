@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol WeatherViewDelegate {
+protocol WeatherViewDelegate: AnyObject {
     func presentWeatherDetail(weatherForecastInfo: WeatherForecastInfo?, cityInfo: City?)
 }
 
@@ -20,7 +20,7 @@ final class WeatherView: UIView {
     
     private var weatherForecast: [WeatherForecastInfo]?
     private var cityInfo: City?
-    let delegate: WeatherViewDelegate
+    weak var delegate: WeatherViewDelegate?
     
     init(delegate: WeatherViewDelegate) {
         self.delegate = delegate
