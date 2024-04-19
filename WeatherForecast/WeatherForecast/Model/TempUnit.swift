@@ -10,14 +10,14 @@ import Foundation
 // MARK: - Temperature Unit
 enum TempUnit: String {
     case metric, imperial
-    var expression: String {
+    fileprivate var expression: String {
         switch self {
         case .metric: return "℃"
         case .imperial: return "℉"
         }
     }
     
-    var title: String {
+    fileprivate var title: String {
         switch self {
         case .metric: return "화씨"
         case .imperial: return "섭씨"
