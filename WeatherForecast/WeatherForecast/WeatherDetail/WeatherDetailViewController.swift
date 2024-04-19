@@ -8,8 +8,8 @@ import UIKit
 
 final class WeatherDetailViewController: UIViewController {
 
-    var weatherForecastInfo: WeatherForecastInfo?
-    var cityInfo: City?
+    var weatherForecastInfo: WeatherForecastInfo
+    var cityInfo: City
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,12 +21,21 @@ final class WeatherDetailViewController: UIViewController {
                                  cityInfo: cityInfo)
     }
     
+    init(weatherForecastInfo: WeatherForecastInfo,
+         cityInfo: City) {
+        self.weatherForecastInfo = weatherForecastInfo
+        self.cityInfo = cityInfo
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private func initialSetUp() {
         view.backgroundColor = .white
-        
-        guard let listInfo = weatherForecastInfo else { return }
-        
-        let date: Date = Date(timeIntervalSince1970: listInfo.dt)
+
+        let date: Date = Date(timeIntervalSince1970: weatherForecastInfo.dt)
         navigationItem.title = date.toWeatherDateString
     }
 }
