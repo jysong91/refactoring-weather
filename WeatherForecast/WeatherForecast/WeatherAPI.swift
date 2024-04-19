@@ -8,23 +8,23 @@
 import UIKit
 
 protocol WeatherServiceable {
-    func fetchWeatherJSON() async -> WeatherJSON?
+    func fetchWeatherJSON() async throws -> WeatherJSON
 }
 
 final class WeatherAPI: WeatherServiceable {
-    func fetchWeatherJSON() async -> WeatherJSON? {
+    func fetchWeatherJSON() async throws -> WeatherJSON {
         let jsonDecoder: JSONDecoder = .init()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
         
         guard let data = NSDataAsset(name: "weather")?.data else {
-            return nil
+            throw NetworkError.responesError
         }
         
-        var info: WeatherJSON? = nil
+        var info: WeatherJSON
         do {
             info = try jsonDecoder.decode(WeatherJSON.self, from: data)
         } catch {
-            print(error.localizedDescription)
+            throw NetworkError.decodeError
         }
         
         return info

@@ -41,11 +41,31 @@ extension WeatherViewController {
     
     @objc private func refresh() {
         Task {
-            if let weatherJSON = await api.fetchWeatherJSON() {
-                weatherView?.tableViewReloadData(with: weatherJSON)
-                navigationItem.title = weatherJSON.city.name
-            }
+            await fetchWeatherAPI()
             refreshControl.endRefreshing()
+        }
+    }
+    
+    private func fetchWeatherAPI() async {
+        do {
+            let weatherJSON = try await api.fetchWeatherJSON()
+            weatherView?.tableViewReloadData(with: weatherJSON)
+            navigationItem.title = weatherJSON.city.name
+        } catch {
+            let error = error as? NetworkError
+            let errorMessage: String
+            switch error {
+            case .responesError:
+                errorMessage = "응답 처리 중 오류가 발생했습니다."
+            case .decodeError:
+                errorMessage = "데이터 처리 중 오류가 발생했습니다."
+            case nil:
+                errorMessage = "알 수 없는 오류가 발생했습니다."
+            }
+            Util.showAlert(viewController: self,
+                           title: "오류",
+                           message: errorMessage,
+                           buttonTitle: "확인")
         }
     }
     

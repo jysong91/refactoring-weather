@@ -24,4 +24,5 @@ struct TempFormatter {
     func minimumTemperatureFormat(info: WeatherForecastInfo, tempUnit: TempUnit) -> String {
         return "\(info.main.tempMin)\(tempUnit)"
     }
+    
 }
