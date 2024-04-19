@@ -7,6 +7,8 @@
 import UIKit
 
 class WeatherTableViewCell: UITableViewCell {
+    static let reuseIdentifier = "WeatherTableViewCell"
+    
     var weatherIcon: UIImageView!
     var dateLabel: UILabel!
     var temperatureLabel: UILabel!

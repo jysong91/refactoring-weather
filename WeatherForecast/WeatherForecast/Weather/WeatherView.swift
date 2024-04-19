@@ -14,7 +14,8 @@ final class WeatherView: UIView {
     
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.register(WeatherTableViewCell.self, forCellReuseIdentifier: "WeatherCell")
+        tableView.register(WeatherTableViewCell.self,
+                           forCellReuseIdentifier: WeatherTableViewCell.reuseIdentifier)
         return tableView
     }()
     
