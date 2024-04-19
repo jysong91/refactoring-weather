@@ -83,9 +83,7 @@ extension WeatherViewController {
 }
 
 extension WeatherViewController: WeatherView.Delegate {
-    func presentWeatherDetail(weatherForecastInfo: WeatherForecastInfo?, cityInfo: City?) {
-        guard let weatherForecastInfo = weatherForecastInfo,
-                  let cityInfo = cityInfo else { return }
+    func presentWeatherDetail(weatherForecastInfo: WeatherForecastInfo, cityInfo: City) {
         let detailViewController: WeatherDetailViewController = WeatherDetailViewController(
             weatherForecastInfo: weatherForecastInfo,
             cityInfo: cityInfo)
