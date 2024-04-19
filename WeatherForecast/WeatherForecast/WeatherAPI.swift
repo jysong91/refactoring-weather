@@ -12,6 +12,9 @@ protocol WeatherServiceable {
 }
 
 final class WeatherAPI: WeatherServiceable {
+    
+    static let imageURL = "https://openweathermap.org/img/wn/"
+    
     func fetchWeatherJSON() async throws -> WeatherJSON {
         let jsonDecoder: JSONDecoder = .init()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase

@@ -110,7 +110,7 @@ class WeatherTableViewCell: UITableViewCell {
         dateLabel.text = date.toWeatherDateString
         
         let iconName: String = weatherForecastInfo.weather.icon
-        let urlString: String = "\(Constant.ImageURL.weatherImg)\(iconName)@2x.png"
+        let urlString: String = "\(WeatherAPI.imageURL)\(iconName)@2x.png"
         weatherIcon.loadImage(with: urlString)
  
     }
