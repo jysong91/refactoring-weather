@@ -35,7 +35,7 @@ final class WeatherViewController: UIViewController {
 extension WeatherViewController {
     @objc private func changeTempUnit() {
         TempUnitManager.shared.changeTempUnit()
-        navigationItem.rightBarButtonItem?.title = TempUnitManager.shared.getCurrentUnitTitle()
+        navigationItem.rightBarButtonItem?.title = TempUnitManager.shared.currentUnit.title
         refresh()
     }
     

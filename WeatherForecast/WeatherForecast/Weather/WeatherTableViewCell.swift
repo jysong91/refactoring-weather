@@ -106,7 +106,10 @@ class WeatherTableViewCell: UITableViewCell {
     func updateCell(with weatherForecastInfo: WeatherForecastInfo) {
         weatherLabel.text = weatherForecastInfo.weather.main
         descriptionLabel.text = weatherForecastInfo.weather.description
-        temperatureLabel.text = "\(weatherForecastInfo.main.temp)\(TempUnitManager.shared.getCurrentUnitExpression())"
+        let tempFormatter = TempFormatter()
+        temperatureLabel.text = tempFormatter.temperatureFormat(info: weatherForecastInfo,
+                                                                tempUnit: TempUnitManager.shared.currentUnit)
+        
         
         let date: Date = Date(timeIntervalSince1970: weatherForecastInfo.dt)
         dateLabel.text = date.toWeatherDateString
