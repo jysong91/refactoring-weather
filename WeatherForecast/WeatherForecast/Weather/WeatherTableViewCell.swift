@@ -116,7 +116,9 @@ class WeatherTableViewCell: UITableViewCell {
         
         let iconName: String = weatherForecastInfo.weather.icon
         let urlString: String = "\(WeatherAPI.imageURL)\(iconName)@2x.png"
-        weatherIcon.loadImage(with: urlString)
- 
+
+        Task {
+            weatherIcon.image = await ImageLoader.loadImage(for: urlString)
+        }
     }
 }

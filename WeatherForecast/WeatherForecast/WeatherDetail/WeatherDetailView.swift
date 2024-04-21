@@ -116,6 +116,9 @@ final class WeatherDetailView: UIView {
         
         let iconName: String = listInfo.weather.icon
         let urlString: String = "\(WeatherAPI.imageURL)\(iconName)@2x.png"
-        iconImageView.loadImage(with: urlString)
+        
+        Task {
+            iconImageView.image = await ImageLoader.loadImage(for: urlString)
+        }
     }
 }
