@@ -15,11 +15,14 @@ final class DiskCache: ImageCachable {
     
     private func cacheFileURL(for key: String) -> URL {
         let fileName = sha256(key)
-        let directoryURL = try? fileManager.url(for: .cachesDirectory,
-                                                in: .userDomainMask,
-                                                appropriateFor: nil,
-                                                   create: true)
-        return directoryURL?.appendingPathComponent(fileName, isDirectory: false) ?? URL(fileURLWithPath: "")
+//        let directoryURL = try? fileManager.url(for: .cachesDirectory,
+//                                                in: .userDomainMask,
+//                                                appropriateFor: nil,
+//                                                   create: true)
+//        return directoryURL?.appendingPathComponent(fileName, isDirectory: false) ?? URL(fileURLWithPath: "")
+        
+        let directoryURL = try? fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("ImageCache")
+        return directoryURL ?? URL(fileURLWithPath: "")
     }
     
     func value(for key: String) -> UIImage? {
@@ -31,6 +34,7 @@ final class DiskCache: ImageCachable {
         
         do {
             let data = try Data(contentsOf: fileURL)
+            print("디스크 캐시 로드")
             return UIImage(data: data)
         } catch {
             return nil
@@ -42,6 +46,7 @@ final class DiskCache: ImageCachable {
         let fileURL = cacheFileURL(for: key)
         
         do {
+            print("디스크 캐시 저장")
             try data.write(to: fileURL)
         } catch {
             print("Error writing image to disk: \(error)")

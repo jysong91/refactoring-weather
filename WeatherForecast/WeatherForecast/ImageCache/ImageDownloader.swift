@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ImageDownloader {
+struct ImageDownloader {
     
     static func downloadImage(from urlString: String) async -> UIImage? {
         guard let url = URL(string: urlString) else {

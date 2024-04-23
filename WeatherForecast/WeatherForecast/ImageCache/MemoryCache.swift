@@ -14,7 +14,7 @@ final class MemoryCache: ImageCachable {
     init() {}
     
     func value(for key: String) -> UIImage? {
-        cache.object(forKey: NSString(string: key))
+        return cache.object(forKey: NSString(string: key))
     }
     
     func store(for key: String, image: UIImage) {

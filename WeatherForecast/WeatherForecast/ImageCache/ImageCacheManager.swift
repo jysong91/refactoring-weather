@@ -7,41 +7,58 @@
 
 import UIKit
 
+enum CacheOption {
+    case onlyMemory
+    case onlyDisk
+    case both
+    case nothing
+}
+
 actor ImageCacheManager {
   
     static let shared = ImageCacheManager()
     private let memoryCache: MemoryCache = MemoryCache()
     private let diskCache: DiskCache = DiskCache()
+    private var option: CacheOption = .both
     
-    func image(for key: String) async -> UIImage? {
-        if let image = imageWithMemoryCache(for: key) {
-            return image
-        } else {
-            return await imageWithDiskCache(for: key)
-        }
+    init(_ option: CacheOption = .onlyDisk) {
+        self.option = option
     }
     
-    private func imageWithMemoryCache(for key: String) -> UIImage? {
+    func image(for key: String) async -> UIImage? {
+        if let memoryImage = loadMemoryCache(for: key) {
+            return memoryImage
+        }
+        
+        if let diskImage = loadDiskCache(for: key) {
+            self.store(for: key, image: diskImage)
+            return diskImage
+        }
+        
+        if let downloadImage = await ImageDownloader.downloadImage(from: key) {
+            self.store(for: key, image: downloadImage)
+            return downloadImage
+        }
+        
+        return nil
+    }
+    
+    private func loadMemoryCache(for key: String) -> UIImage? {
         return memoryCache.value(for: key)
     }
     
-    private func imageWithDiskCache(for key: String) async -> UIImage? {
-        if let image = diskCache.value(for: key) {
-            store(for: key, image: image, includeDisk: false)
-            return image
-        } else {
-            if let image = await ImageDownloader.downloadImage(from: key) {
-                self.store(for: key, image: image, includeDisk: true)
-            }
-            
-            return nil
-        }
+    private func loadDiskCache(for key: String) -> UIImage? {
+        return diskCache.value(for: key)
     }
     
-    private func store(for key: String, image: UIImage, includeDisk: Bool) {
-        memoryCache.store(for: key, image: image)
+    
+    
+    private func store(for key: String, image: UIImage) {
+        if option == .both || option == .onlyMemory {
+            memoryCache.store(for: key, image: image)
+        }
         
-        if includeDisk {
+        if option == .both || option == .onlyDisk {
             diskCache.store(for: key, image: image)
         }
     }
