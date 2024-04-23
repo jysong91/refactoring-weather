@@ -21,7 +21,7 @@ actor ImageCacheManager {
     private let diskCache: DiskCache = DiskCache()
     private var option: CacheOption = .both
     
-    init(_ option: CacheOption = .onlyDisk) {
+    init(_ option: CacheOption = .both) {
         self.option = option
     }
     
@@ -31,12 +31,13 @@ actor ImageCacheManager {
         }
         
         if let diskImage = loadDiskCache(for: key) {
-            self.store(for: key, image: diskImage)
+            self.storeMemoryCache(for: key, image: diskImage)
             return diskImage
         }
         
         if let downloadImage = await ImageDownloader.downloadImage(from: key) {
-            self.store(for: key, image: downloadImage)
+            self.storeMemoryCache(for: key, image: downloadImage)
+            self.storeDiskCache(for: key, image: downloadImage)
             return downloadImage
         }
         
@@ -48,17 +49,16 @@ actor ImageCacheManager {
     }
     
     private func loadDiskCache(for key: String) -> UIImage? {
-        // TODO: - 저장된 캐시가 로드되지 않고 있음. 확인필요
         return diskCache.value(for: key)
     }
     
-    
-    
-    private func store(for key: String, image: UIImage) {
+    private func storeMemoryCache(for key: String, image: UIImage) {
         if option == .both || option == .onlyMemory {
             memoryCache.store(for: key, image: image)
         }
-        
+    }
+    
+    private func storeDiskCache(for key: String, image: UIImage) {
         if option == .both || option == .onlyDisk {
             diskCache.store(for: key, image: image)
         }

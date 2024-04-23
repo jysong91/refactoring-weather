@@ -8,8 +8,8 @@ import UIKit
 
 final class WeatherDetailViewController: UIViewController {
 
-    var weatherForecastInfo: WeatherForecastInfo
-    var cityInfo: City
+    private let weatherForecastInfo: WeatherForecastInfo
+    private let cityInfo: City
     
     override func viewDidLoad() {
         super.viewDidLoad()
