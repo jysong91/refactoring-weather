@@ -11,7 +11,9 @@ final class MemoryCache: ImageCachable {
     
     private var cache = NSCache<NSString, UIImage>()
     
-    init() {}
+    init(countLimit: Int = 50) {
+        cache.countLimit = countLimit
+    }
     
     func value(for key: String) -> UIImage? {
         return cache.object(forKey: NSString(string: key))

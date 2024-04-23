@@ -10,16 +10,20 @@ import UIKit
 
 final class DiskCache: ImageCachable {
     private let fileManager: FileManager = FileManager.default
+    private let directoryURL: URL
+    private let countLimit: Int
     
-    init() {}
-    
-    private func cacheFileURL(for key: String) -> URL {
-        let fileName = sha256(key)
-        let directoryURL = try? fileManager.url(for: .cachesDirectory,
+    init(countLimit: Int = 50) {
+        self.countLimit = countLimit
+        self.directoryURL = try! fileManager.url(for: .cachesDirectory,
                                                 in: .userDomainMask,
                                                 appropriateFor: nil,
                                                    create: true)
-        return directoryURL?.appendingPathComponent(fileName, isDirectory: false) ?? URL(fileURLWithPath: "")
+    }
+    
+    private func cacheFileURL(for key: String) -> URL {
+        let fileName = sha256(key)
+        return directoryURL.appendingPathComponent(fileName, isDirectory: false)
     }
     
     func value(for key: String) -> UIImage? {
@@ -41,6 +45,10 @@ final class DiskCache: ImageCachable {
         guard let data = image.jpegData(compressionQuality: 0.5) else { return }
         let fileURL = cacheFileURL(for: key)
         
+        if countStoredCaches() >= countLimit {
+            removeOldCache()
+        }
+        
         do {
             try data.write(to: fileURL)
         } catch {
@@ -48,5 +56,27 @@ final class DiskCache: ImageCachable {
         }
     }
     
+    private func countStoredCaches() -> Int {
+        do {
+            let fileURLs = try fileManager.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
+            return fileURLs.count
+        } catch {
+            return 0
+        }
+    }
+    
+    
+    private func removeOldCache() {
+        guard let oldestFileURL = try? fileManager.contentsOfDirectory(at: directoryURL,
+                                                                       includingPropertiesForKeys: nil).first else {
+            return
+        }
+        
+        do {
+            try fileManager.removeItem(at: oldestFileURL)
+        } catch {
+            print("Error removing oldest item from disk cache: \(error)")
+        }
+    }
     
 }
