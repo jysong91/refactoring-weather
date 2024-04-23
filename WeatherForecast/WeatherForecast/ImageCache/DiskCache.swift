@@ -7,7 +7,8 @@
 
 import UIKit
 
-final class DiskCache {
+
+final class DiskCache: ImageCachable {
     private let fileManager: FileManager = FileManager.default
     
     init() {}
@@ -21,21 +22,30 @@ final class DiskCache {
         return directoryURL?.appendingPathComponent(fileName, isDirectory: false) ?? URL(fileURLWithPath: "")
     }
     
-    func value(for key: String) throws -> UIImage? {
+    func value(for key: String) -> UIImage? {
         let fileURL = cacheFileURL(for: key)
         
         guard fileManager.fileExists(atPath: fileURL.path()) else {
             return nil
         }
         
-        let data = try Data(contentsOf: fileURL)
-        return UIImage(data: data)
+        do {
+            let data = try Data(contentsOf: fileURL)
+            return UIImage(data: data)
+        } catch {
+            return nil
+        }
     }
     
-    func store(for key: String, image: UIImage) throws {
-        let data = image.jpegData(compressionQuality: 0.5)
+    func store(for key: String, image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.5) else { return }
         let fileURL = cacheFileURL(for: key)
-        try data?.write(to: fileURL)
+        
+        do {
+            try data.write(to: fileURL)
+        } catch {
+            print("Error writing image to disk: \(error)")
+        }
     }
     
     

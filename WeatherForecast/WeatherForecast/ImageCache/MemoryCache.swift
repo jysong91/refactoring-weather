@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MemoryCache {
+final class MemoryCache: ImageCachable {
     
     private var cache = NSCache<NSString, UIImage>()
     

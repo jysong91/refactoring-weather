@@ -27,6 +27,7 @@
 		D49CA6022BD4D2B7000C36AF /* DiskCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49CA6012BD4D2B7000C36AF /* DiskCache.swift */; };
 		D49CA6042BD4D54D000C36AF /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49CA6032BD4D54D000C36AF /* ImageDownloader.swift */; };
 		D49CA6062BD4FB21000C36AF /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49CA6052BD4FB21000C36AF /* ImageLoader.swift */; };
+		D49CA6082BD74724000C36AF /* ImageCachable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49CA6072BD74724000C36AF /* ImageCachable.swift */; };
 		D4C5F2CD2BCCFD88008055B5 /* Date+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C5F2CC2BCCFD88008055B5 /* Date+extension.swift */; };
 		D4C5F2D42BCF8F80008055B5 /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C5F2D32BCF8F80008055B5 /* WeatherView.swift */; };
 		D4C5F2D82BCF98C3008055B5 /* WeatherDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C5F2D72BCF98C3008055B5 /* WeatherDetailView.swift */; };
@@ -68,6 +69,7 @@
 		D49CA6012BD4D2B7000C36AF /* DiskCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskCache.swift; sourceTree = "<group>"; };
 		D49CA6032BD4D54D000C36AF /* ImageDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDownloader.swift; sourceTree = "<group>"; };
 		D49CA6052BD4FB21000C36AF /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
+		D49CA6072BD74724000C36AF /* ImageCachable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCachable.swift; sourceTree = "<group>"; };
 		D4C5F2CC2BCCFD88008055B5 /* Date+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+extension.swift"; sourceTree = "<group>"; };
 		D4C5F2D32BCF8F80008055B5 /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
 		D4C5F2D72BCF98C3008055B5 /* WeatherDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDetailView.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 			isa = PBXGroup;
 			children = (
 				D49CA5FA2BD4D0EF000C36AF /* ImageCacheManager.swift */,
+				D49CA6072BD74724000C36AF /* ImageCachable.swift */,
 				D49CA5FF2BD4D2B0000C36AF /* MemoryCache.swift */,
 				D49CA6012BD4D2B7000C36AF /* DiskCache.swift */,
 				D49CA6032BD4D54D000C36AF /* ImageDownloader.swift */,
@@ -306,6 +309,7 @@
 				D49CA6002BD4D2B0000C36AF /* MemoryCache.swift in Sources */,
 				D4C5F2DC2BCF9E18008055B5 /* DIContainer.swift in Sources */,
 				D49CA5C32BD22372000C36AF /* TempFormatter.swift in Sources */,
+				D49CA6082BD74724000C36AF /* ImageCachable.swift in Sources */,
 				C7743D912B21C38100DF0D09 /* WeatherViewController.swift in Sources */,
 				C7743D8D2B21C38100DF0D09 /* AppDelegate.swift in Sources */,
 				D49CA6022BD4D2B7000C36AF /* DiskCache.swift in Sources */,
