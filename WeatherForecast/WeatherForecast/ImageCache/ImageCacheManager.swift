@@ -35,12 +35,6 @@ actor ImageCacheManager {
             return diskImage
         }
         
-        if let downloadImage = await ImageDownloader.downloadImage(from: key) {
-            self.storeMemoryCache(for: key, image: downloadImage)
-            self.storeDiskCache(for: key, image: downloadImage)
-            return downloadImage
-        }
-        
         return nil
     }
     
@@ -52,13 +46,13 @@ actor ImageCacheManager {
         return diskCache.value(for: key)
     }
     
-    private func storeMemoryCache(for key: String, image: UIImage) {
+    func storeMemoryCache(for key: String, image: UIImage) {
         if option == .both || option == .onlyMemory {
             memoryCache.store(for: key, image: image)
         }
     }
     
-    private func storeDiskCache(for key: String, image: UIImage) {
+    func storeDiskCache(for key: String, image: UIImage) {
         if option == .both || option == .onlyDisk {
             diskCache.store(for: key, image: image)
         }
