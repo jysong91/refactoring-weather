@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ImageCacheManager {
+actor ImageCacheManager {
   
     static let shared = ImageCacheManager()
     private let memoryCache: MemoryCache = MemoryCache()
@@ -26,7 +26,7 @@ final class ImageCacheManager {
     }
     
     private func imageWithDiskCache(for key: String) async -> UIImage? {
-        if let image = try? diskCache.value(for: key) {
+        if let image = diskCache.value(for: key) {
             store(for: key, image: image, includeDisk: false)
             return image
         } else {
@@ -42,7 +42,7 @@ final class ImageCacheManager {
         memoryCache.store(for: key, image: image)
         
         if includeDisk {
-            try? diskCache.store(for: key, image: image)
+            diskCache.store(for: key, image: image)
         }
     }
     
