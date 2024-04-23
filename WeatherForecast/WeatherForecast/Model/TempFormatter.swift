@@ -9,19 +9,27 @@ import Foundation
 
 struct TempFormatter {
     
-    func temperatureFormat(info: WeatherForecastInfo, tempUnit: TempUnit) -> String {
+    private let info: WeatherForecastInfo
+    private let tempUnit: TempUnit
+    
+    init(info: WeatherForecastInfo, tempUnit: TempUnit) {
+        self.info = info
+        self.tempUnit = tempUnit
+    }
+    
+    func temperatureFormat() -> String {
         return "\(info.main.temp)\(tempUnit.expression)"
     }
     
-    func feelsLikeFormat(info: WeatherForecastInfo, tempUnit: TempUnit) -> String {
+    func feelsLikeFormat() -> String {
         return "\(info.main.feelsLike)\(tempUnit.expression)"
     }
     
-    func maximumTemperatureFormat(info: WeatherForecastInfo, tempUnit: TempUnit) -> String {
+    func maximumTemperatureFormat() -> String {
         return "\(info.main.tempMax)\(tempUnit.expression)"
     }
     
-    func minimumTemperatureFormat(info: WeatherForecastInfo, tempUnit: TempUnit) -> String {
+    func minimumTemperatureFormat() -> String {
         return "\(info.main.tempMin)\(tempUnit.expression)"
     }
     

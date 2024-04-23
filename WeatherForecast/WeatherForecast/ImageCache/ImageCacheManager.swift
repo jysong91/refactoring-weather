@@ -48,6 +48,7 @@ actor ImageCacheManager {
     }
     
     private func loadDiskCache(for key: String) -> UIImage? {
+        // TODO: - 저장된 캐시가 로드되지 않고 있음. 확인필요
         return diskCache.value(for: key)
     }
     
