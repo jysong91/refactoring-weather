@@ -1,18 +1,20 @@
 //
 //  WeatherForecast - WeatherTableViewCell.swift
-//  Created by yagom. 
+//  Created by yagom.
 //  Copyright © yagom. All rights reserved.
-// 
+//
 
 import UIKit
 
 class WeatherTableViewCell: UITableViewCell {
+    static let reuseIdentifier = String(describing: WeatherTableViewCell.self)
+    
     var weatherIcon: UIImageView!
     var dateLabel: UILabel!
     var temperatureLabel: UILabel!
     var weatherLabel: UILabel!
     var descriptionLabel: UILabel!
-     
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         layViews()
@@ -74,7 +76,7 @@ class WeatherTableViewCell: UITableViewCell {
             weatherIcon,
             verticalStackView
         ])
-               
+        
         contentsStackView.axis = .horizontal
         contentsStackView.spacing = 16
         contentsStackView.alignment = .center
@@ -82,7 +84,7 @@ class WeatherTableViewCell: UITableViewCell {
         contentsStackView.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.addSubview(contentsStackView)
-                
+        
         NSLayoutConstraint.activate([
             contentsStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
             contentsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -99,5 +101,24 @@ class WeatherTableViewCell: UITableViewCell {
         temperatureLabel.text = "00℃"
         weatherLabel.text = "~~~"
         descriptionLabel.text = "~~~~~"
+    }
+    
+    func updateCell(with weatherForecastInfo: WeatherForecastInfo) {
+        weatherLabel.text = weatherForecastInfo.weather.main
+        descriptionLabel.text = weatherForecastInfo.weather.description
+        let tempFormatter = TempFormatter(info: weatherForecastInfo,
+                                          tempUnit: TempUnitManager.shared.currentUnit)
+        temperatureLabel.text = tempFormatter.temperatureFormat()
+        
+        
+        let date: Date = Date(timeIntervalSince1970: weatherForecastInfo.dt)
+        dateLabel.text = date.toWeatherDateString
+        
+        let iconName: String = weatherForecastInfo.weather.icon
+        let urlString: String = "\(WeatherAPI.imageURL)\(iconName)@2x.png"
+
+        Task {
+            weatherIcon.image = await ImageLoader.loadImage(for: urlString)
+        }
     }
 }
