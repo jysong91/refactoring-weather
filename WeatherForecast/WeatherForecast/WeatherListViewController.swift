@@ -5,6 +5,7 @@
 // 
 
 import UIKit
+import Foundation
 
 final class ImageCache {
     static let shared: NSCache<NSString, UIImage> = NSCache()
@@ -29,12 +30,8 @@ class WeatherListViewController: UIViewController {
 
 extension WeatherListViewController {
     @objc private func changeTempUnit() {
-        switch tempUnit {
-        case .imperial:
-            tempUnit = .metric
-        case .metric:
-            tempUnit = .imperial
-        }
+        guard let strategy = StrategyContainer.strategies.filter({ $0.checkStrategy(tempUnit: tempUnit) }).first else { return }
+        tempUnit = strategy.changeTempUnit(tempUnit: tempUnit)
         navigationItem.rightBarButtonItem?.title = tempUnit.desc
         refresh()
     }
@@ -103,7 +100,7 @@ extension WeatherListViewController {
     private func setData(cell: WeatherTableViewCell, data: WeatherForecastInfo) {
         cell.weatherLabel.text = data.weather.main
         cell.descriptionLabel.text = data.weather.description
-        cell.temperatureLabel.text = "\(data.main.temp)\(tempUnit.expression)"
+        cell.temperatureLabel.text = "\(data.main.temp.changeTemperature(by:tempUnit))\(tempUnit.expression)"
         cell.dateLabel.text = dateFormatter.string(from: data.dt)
         cell.weatherIcon.setImage(from: data.weather.icon)
     }
@@ -177,4 +174,57 @@ extension UIImageView {
             self.image = image
         }
     }
+}
+
+extension Double {
+    func changeTemperature(by tempUnit: TempUnit) -> String {
+        let strategies: [TempUnitStrategy] = [MetricTempUnitStrategy(), ImperialTempUnitStrategy()]
+        guard let strategy = strategies.filter({ $0.checkStrategy(tempUnit: tempUnit) }).first else { return "" }
+        return strategy.changeTemperatureToString(temperature: self)
+    }
+    
+    func string(format: String? = nil) -> String {
+        if let format = format {
+            return String(format: format, self)
+        }
+        return "\(self)"
+    }
+}
+
+protocol TempUnitStrategy {
+    func changeTempUnit(tempUnit: TempUnit) -> TempUnit
+    func changeTemperatureToString(temperature: Double) -> String
+    func checkStrategy(tempUnit: TempUnit) -> Bool
+}
+
+struct MetricTempUnitStrategy: TempUnitStrategy {
+    func changeTempUnit(tempUnit: TempUnit) -> TempUnit {
+        return .imperial
+    }
+    
+    func checkStrategy(tempUnit: TempUnit) -> Bool {
+        return tempUnit == .metric
+    }
+    
+    func changeTemperatureToString(temperature: Double) -> String {
+        return temperature.string()
+    }
+}
+
+struct ImperialTempUnitStrategy: TempUnitStrategy {
+    func changeTempUnit(tempUnit: TempUnit) -> TempUnit {
+        return .metric
+    }
+    
+    func checkStrategy(tempUnit: TempUnit) -> Bool {
+        return tempUnit == .imperial
+    }
+    
+    func changeTemperatureToString(temperature: Double) -> String {
+        return ((temperature * 1.8) + 32).string(format: "%.2f")
+    }
+}
+
+struct StrategyContainer {
+    static let strategies: [TempUnitStrategy] = [MetricTempUnitStrategy(), ImperialTempUnitStrategy()]
 }

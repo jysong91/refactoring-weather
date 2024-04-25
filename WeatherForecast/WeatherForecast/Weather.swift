@@ -50,32 +50,29 @@ class Coord: Decodable {
 }
 
 // MARK: - Temperature Unit
-enum TempUnit: String {
+enum TempUnit: String, CaseIterable {
     case metric, imperial
     var expression: String {
-        guard let expression = expressionMapping[self.rawValue] else { return ""}
-        return expression.rawValue
+        guard let expression = expressionMapping[self] else { return ""}
+        return expression
     }
     
     var desc: String {
-        switch self {
-        case .metric:
-            return "섭씨"
-        case .imperial:
-            return "화씨"
-        }
+        guard let desc = descMapping[self] else { return ""}
+        return desc
     }
     
-    private var expressionMapping: [String: TempExpression] {
+    private var expressionMapping: [TempUnit: String] {
         return [
-            TempUnit.metric.rawValue: .metric,
-            TempUnit.imperial.rawValue: .imperial
+            TempUnit.metric: "℃",
+            TempUnit.imperial: "℉"
+        ]
+    }
+    
+    private var descMapping: [TempUnit: String] {
+        return [
+            TempUnit.metric: "섭씨",
+            TempUnit.imperial: "화씨"
         ]
     }
 }
-
-enum TempExpression: String {
-    case metric = "℃"
-    case imperial = "℉"
-}
-
