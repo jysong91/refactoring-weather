@@ -53,10 +53,29 @@ class Coord: Decodable {
 enum TempUnit: String {
     case metric, imperial
     var expression: String {
+        guard let expression = expressionMapping[self.rawValue] else { return ""}
+        return expression.rawValue
+    }
+    
+    var desc: String {
         switch self {
-        case .metric: return "℃"
-        case .imperial: return "℉"
+        case .metric:
+            return "섭씨"
+        case .imperial:
+            return "화씨"
         }
     }
+    
+    private var expressionMapping: [String: TempExpression] {
+        return [
+            TempUnit.metric.rawValue: .metric,
+            TempUnit.imperial.rawValue: .imperial
+        ]
+    }
+}
+
+enum TempExpression: String {
+    case metric = "℃"
+    case imperial = "℉"
 }
 

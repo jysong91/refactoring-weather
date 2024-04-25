@@ -6,18 +6,18 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+final class ImageCache {
+    static let shared: NSCache<NSString, UIImage> = NSCache()
+    private init() {}
+}
+
+class WeatherListViewController: UIViewController {
+    
     var tableView: UITableView!
     let refreshControl: UIRefreshControl = UIRefreshControl()
     var weatherJSON: WeatherJSON?
     var icons: [UIImage]?
-    let imageChache: NSCache<NSString, UIImage> = NSCache()
-    let dateFormatter: DateFormatter = {
-        let formatter: DateFormatter = DateFormatter()
-        formatter.locale = .init(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy-MM-dd(EEEEE) a HH:mm"
-        return formatter
-    }()
+    let dateFormatter: DateFormatter = DateFormatter(format: "yyyy-MM-dd(EEEEE) a HH:mm")
     
     var tempUnit: TempUnit = .metric
     
@@ -27,16 +27,15 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController {
+extension WeatherListViewController {
     @objc private func changeTempUnit() {
         switch tempUnit {
         case .imperial:
             tempUnit = .metric
-            navigationItem.rightBarButtonItem?.title = "섭씨"
         case .metric:
             tempUnit = .imperial
-            navigationItem.rightBarButtonItem?.title = "화씨"
         }
+        navigationItem.rightBarButtonItem?.title = tempUnit.desc
         refresh()
     }
     
@@ -47,18 +46,11 @@ extension ViewController {
     }
     
     private func initialSetUp() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "화씨", image: nil, target: self, action: #selector(changeTempUnit))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: tempUnit.desc, image: nil, target: self, action: #selector(changeTempUnit))
         
         layTable()
-        
-        refreshControl.addTarget(self,
-                                 action: #selector(refresh),
-                                 for: .valueChanged)
-        
-        tableView.refreshControl = refreshControl
-        tableView.register(WeatherTableViewCell.self, forCellReuseIdentifier: "WeatherCell")
-        tableView.dataSource = self
-        tableView.delegate = self
+        setTable()
+        refresh()
     }
     
     private func layTable() {
@@ -75,17 +67,26 @@ extension ViewController {
             tableView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
         ])
     }
+    
+    private func setTable() {
+        refreshControl.addTarget(self,
+                                 action: #selector(refresh),
+                                 for: .valueChanged)
+        
+        tableView.refreshControl = refreshControl
+        tableView.register(WeatherTableViewCell.self, forCellReuseIdentifier: "WeatherCell")
+        tableView.dataSource = self
+        tableView.delegate = self
+    }
 }
 
-extension ViewController {
+extension WeatherListViewController {
     private func fetchWeatherJSON() {
         
         let jsonDecoder: JSONDecoder = .init()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
 
-        guard let data = NSDataAsset(name: "weather")?.data else {
-            return
-        }
+        guard let data = NSDataAsset(name: "weather")?.data else { return }
         
         let info: WeatherJSON
         do {
@@ -98,9 +99,17 @@ extension ViewController {
         weatherJSON = info
         navigationItem.title = weatherJSON?.city.name
     }
+    
+    private func setData(cell: WeatherTableViewCell, data: WeatherForecastInfo) {
+        cell.weatherLabel.text = data.weather.main
+        cell.descriptionLabel.text = data.weather.description
+        cell.temperatureLabel.text = "\(data.main.temp)\(tempUnit.expression)"
+        cell.dateLabel.text = dateFormatter.string(from: data.dt)
+        cell.weatherIcon.setImage(from: data.weather.icon)
+    }
 }
 
-extension ViewController: UITableViewDataSource {
+extension WeatherListViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         1
@@ -114,23 +123,47 @@ extension ViewController: UITableViewDataSource {
         let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell", for: indexPath)
         
         guard let cell: WeatherTableViewCell = cell as? WeatherTableViewCell,
-              let weatherForecastInfo = weatherJSON?.weatherForecast[indexPath.row] else {
+              let weatherForecastInfo: WeatherForecastInfo = weatherJSON?.weatherForecast[indexPath.row] else {
             return cell
         }
+
+        setData(cell: cell, data: weatherForecastInfo)
         
-        cell.weatherLabel.text = weatherForecastInfo.weather.main
-        cell.descriptionLabel.text = weatherForecastInfo.weather.description
-        cell.temperatureLabel.text = "\(weatherForecastInfo.main.temp)\(tempUnit.expression)"
-        
-        let date: Date = Date(timeIntervalSince1970: weatherForecastInfo.dt)
-        cell.dateLabel.text = dateFormatter.string(from: date)
-                
-        let iconName: String = weatherForecastInfo.weather.icon         
+        return cell
+    }
+}
+
+extension WeatherListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let detailViewController: WeatherDetailViewController = WeatherDetailViewController()
+        detailViewController.weatherForecastInfo = weatherJSON?.weatherForecast[indexPath.row]
+        detailViewController.cityInfo = weatherJSON?.city
+        detailViewController.tempUnit = tempUnit
+        navigationController?.show(detailViewController, sender: self)
+    }
+}
+
+extension DateFormatter {
+    convenience init(format: String?) {
+        self.init()
+        self.locale = .init(identifier: "ko_KR")
+        self.dateFormat = format
+    }
+    
+    func string(from timeInterval: TimeInterval) -> String {
+        let date: Date = Date(timeIntervalSince1970: timeInterval)
+        return self.string(from: date)
+    }
+}
+
+extension UIImageView {
+    func setImage(from iconName: String, cache: NSCache<NSString, UIImage>? = ImageCache.shared) {
         let urlString: String = "https://openweathermap.org/img/wn/\(iconName)@2x.png"
-                
-        if let image = imageChache.object(forKey: urlString as NSString) {
-            cell.weatherIcon.image = image
-            return cell
+        
+        if let cache = cache, let image = cache.object(forKey: urlString as NSString) {
+            self.image = image
+            return
         }
         
         Task {
@@ -140,27 +173,8 @@ extension ViewController: UITableViewDataSource {
                 return
             }
             
-            imageChache.setObject(image, forKey: urlString as NSString)
-            
-            if indexPath == tableView.indexPath(for: cell) {
-                cell.weatherIcon.image = image
-            }
+            cache?.setObject(image, forKey: urlString as NSString)
+            self.image = image
         }
-        
-        return cell
     }
 }
-
-extension ViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        let detailViewController: WeatherDetailViewController = WeatherDetailViewController()
-        detailViewController.weatherForecastInfo = weatherJSON?.weatherForecast[indexPath.row]
-        detailViewController.cityInfo = weatherJSON?.city
-        detailViewController.tempUnit = tempUnit
-        navigationController?.show(detailViewController, sender: self)
-    }
-}
-
-
